@@ -1,0 +1,15 @@
+$servers = get-content d:/serverlist.txt
+
+$output=foreach ( $server in $servers )
+{
+
+
+Get-ChildItem Cert:\LocalMachine\ -Recurse | Select Subject,Issuer,Thumbprint,FriendlyName,NotAfter,Extensions,PSParentPath,@{Label="Servername";Expression={($server)}} 
+
+}
+
+
+$output | Out-File "d:/certificateoutput.txt" -Width 200
+
+
+send-mailmessage -from "akshay.mohan@clariant.com" -to "akshay.mohan@clariant.com" -subject "Daily Check: Server certificate details" -body "Please find certificate details attached"-Attachments "d:/certificateoutput.txt" -BodyAsHtml -smtpServer smtpint.clariant.com

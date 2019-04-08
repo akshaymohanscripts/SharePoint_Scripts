@@ -1,0 +1,18 @@
+$servers = get-content d:/serverlist.txt
+
+$output=foreach ( $server in $servers )
+{
+
+
+$threshold = 1000   #Number of days to look for expiring certificates
+$deadline = (Get-Date).AddDays($threshold)   #Set deadline date
+Dir Cert:\LocalMachine\My | foreach {
+If ($_.NotAfter -le $deadline) { $_ | Select Issuer, Subject, NotAfter,@{Label="Servername";Expression={($server)}},@{Label="Expire In days";Expression={($_.NotAfter - (Get-Date)).Days}} }
+
+}
+} 
+
+$output | Out-File "d:/certificateoutput.txt" -Width 200
+
+
+send-mailmessage -from "akshay.mohan@clariant.com" -to "akshay.mohan@clariant.com" -subject "Daily Check: Server certificate details" -body "Please find certificate details attached"-Attachments "d:/certificateoutput.txt" -BodyAsHtml -smtpServer smtpint.clariant.com

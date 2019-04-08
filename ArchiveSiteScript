@@ -1,0 +1,25 @@
+if ( (Get-PSSnapin -Name Microsoft.SharePoint.PowerShell -ErrorAction SilentlyContinue) -eq $null )  
+{   
+    Add-PSSnapin Microsoft.SharePoint.Powershell   
+}
+
+$sitelist= get-content d:/sitelist.txt
+
+$output1=foreach($sites in $sitelist){
+
+$DB=(Get-SPContentDatabase -Site $sites).Name
+
+
+
+if($DB -eq "sp_prod_sharepoint_content100"){
+          
+          echo "$sites is in correct database"
+          
+          }
+          else{
+          
+          Move-SPSite $sites -DestinationDatabase sp_prod_sharepoint_content100
+          echo "$sites has been moved"
+          }
+  }  
+  $output1 | Out-File "d:/result2.txt" 
